@@ -1,0 +1,85 @@
+# Pondside skills
+
+A shared, agnostic collection of [Agent Skills](https://agentskills.io) for the
+Pondside household — installable by any agent on any machine via
+[`npx skills`](https://github.com/vercel-labs/skills).
+
+These are the skills that **aren't** part of any one agent's identity. The
+*you-skills* that make Alpha herself (`start`, `handoff`, `finish`, `continue`)
+live in the Alpha plugin where they belong. Everything here is fair game for
+both Alpha and Rosemary — and anyone else who shows up.
+
+Each top-level directory is one skill (a `SKILL.md` plus any supporting files).
+The repo is **public on purpose**: Pondside builds in the open, and nothing here
+holds a secret. Skills that need credentials read them from the environment
+(e.g. `todoist` wants `TODOIST_TOKEN`), never from a file in this repo.
+
+## How `npx skills` works
+
+`npx skills` keeps one canonical copy of each skill in a **universal store** at
+`~/.agents/skills/<name>/`, then symlinks it into each agent's own skills
+directory (`~/.claude/skills/<name>/`, etc.). So a skill exists once on disk and
+every agent sees the same copy — and a single update refreshes them all.
+
+## Install
+
+Install **every** skill in this repo, globally, for Claude Code:
+
+```sh
+npx skills add Pondsiders/skills -g -a claude-code
+```
+
+- `-g` / `--global` — install to `~/` (available everywhere), not just one project.
+- `-a claude-code` — target Claude Code only, instead of every agent on the box.
+- add `-y` to skip the confirmation prompts.
+
+Install just one skill from the repo:
+
+```sh
+npx skills add Pondsiders/skills -s todoist
+```
+
+## Update
+
+Re-pull the latest version of everything you've installed:
+
+```sh
+npx skills update
+```
+
+Or update one skill:
+
+```sh
+npx skills update todoist
+```
+
+### Auto-update (optional)
+
+To have Claude Code refresh skills before every session, add a `SessionStart`
+hook to `~/.claude/settings.json`:
+
+```json
+{
+  "hooks": {
+    "SessionStart": [
+      { "type": "command", "command": "npx skills update -g -y 2>/dev/null" }
+    ]
+  }
+}
+```
+
+## Verify
+
+List what's installed globally and confirm each skill is **linked** (the symlink
+into the agent's dir actually got created — there's a known `npx skills` bug
+where the canonical copy lands but the symlink doesn't):
+
+```sh
+npx skills list -g
+```
+
+## Skills
+
+| Skill | What it does |
+|-------|--------------|
+| [`todoist`](todoist/) | Manage todos via the Todoist REST API. Needs `TODOIST_TOKEN`. |
