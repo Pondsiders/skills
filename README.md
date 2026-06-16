@@ -23,21 +23,27 @@ every agent sees the same copy — and a single update refreshes them all.
 
 ## Install
 
-Install **every** skill in this repo, globally, for Claude Code:
+Install **every** skill in this repo, globally:
 
 ```sh
-npx skills add Pondsiders/skills -g -a claude-code
+npx skills add Pondsiders/skills -g
+```
+
+Install just **one** skill from the repo:
+
+```sh
+npx skills add Pondsiders/skills -s todoist -g
 ```
 
 - `-g` / `--global` — install to `~/` (available everywhere), not just one project.
-- `-a claude-code` — target Claude Code only, instead of every agent on the box.
-- add `-y` to skip the confirmation prompts.
+- `-s <name>` / `--skill <name>` — pick a single skill instead of all of them.
+- `-y` — skip the confirmation prompts (non-interactive).
 
-Install just one skill from the repo:
-
-```sh
-npx skills add Pondsiders/skills -s todoist
-```
+> **Don't pass `-a claude-code`.** With no agent target, `npx skills` installs the
+> canonical copy into the universal store (`~/.agents/skills/`) and **symlinks** it
+> into every detected agent's dir — the one-copy-many-views model above. Passing
+> `-a <agent>` instead forces a plain **copy** into just that agent's directory,
+> which breaks the shared-store story. Omit it.
 
 ## Update
 
