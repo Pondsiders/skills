@@ -88,4 +88,6 @@ npx skills list -g
 
 | Skill | What it does |
 |-------|--------------|
-| [`todoist`](todoist/) | Manage todos via the Todoist REST API. Needs `TODOIST_TOKEN`. |
+| [`home-assistant`](home-assistant/) | Operate the household's Home Assistant — read the house's senses, control devices, edit dashboards, write automations. |
+| [`pondside-skills`](pondside-skills/) | How this skill system works — the repo, `npx skills`, the universal store, and the recipe for authoring or retiring a skill. |
+| [`todos`](todos/) | Alpha's todos, kept in the Obsidian vault (`~/Obsidian/Alpha/Todos.md`); open items auto-load at `/start`. Replaces the retired `todoist` skill. |
