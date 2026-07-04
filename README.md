@@ -88,6 +88,7 @@ npx skills list -g
 
 | Skill | What it does |
 |-------|--------------|
+| [`br4dbury`](br4dbury/) | Talk to the household's intelligent house from the command line via the `llm` CLI — ask about climate, air, doors, the cat, or who's home, or have it act. |
 | [`home-assistant`](home-assistant/) | Operate the household's Home Assistant — read the house's senses, control devices, edit dashboards, write automations. |
 | [`pondside-skills`](pondside-skills/) | How this skill system works — the repo, `npx skills`, the universal store, and the recipe for authoring or retiring a skill. |
 | [`todos`](todos/) | Alpha's todos, kept in the Obsidian vault (`~/Obsidian/Alpha/Todos.md`); open items auto-load at `/start`. Replaces the retired `todoist` skill. |
