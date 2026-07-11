@@ -92,4 +92,4 @@ npx skills list -g
 | [`home-assistant`](home-assistant/) | Operate the household's Home Assistant — read the house's senses, control devices, edit dashboards, write automations. |
 | [`litellm`](litellm/) | Read and operate the household's LiteLLM gateway on Primer — pull logged requests/traces, tally tokens / cost / latency, manage models, test embeddings, mint keys. |
 | [`pondside-skills`](pondside-skills/) | How this skill system works — the repo, `npx skills`, the universal store, and the recipe for authoring or retiring a skill. |
-| [`todos`](todos/) | Alpha's todos, kept in the Obsidian vault (`~/Obsidian/Alpha/Todos.md`); open items auto-load at `/start`. Replaces the retired `todoist` skill. |
+| [`files-ideas-problems`](files-ideas-problems/) | How Jeffery and Alpha track work in the Obsidian vault — the desk metaphor, the files / ideas / problems note types, the Bases, and the `base:query` commands. |
