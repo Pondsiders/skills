@@ -1,6 +1,6 @@
 ---
 name: pondside-llm-wiki
-description: Build and maintain a personal-world wiki — compiled knowledge about your human's life. Use when you notice a recurring entity you don't recognize (a vendor that keeps emailing, a name that keeps coming up), when your human answers "anything I should know about X?", when asked to look something up about their world, or when your notes about people/companies/services outgrow your memory file. A trimmed household adaptation of Karpathy's LLM Wiki: entities, an index, a log, an orientation ritual — without the research-grade ceremony. Covers initialization, the ask-then-file loop, page thresholds, and the privacy rule for email-derived knowledge.
+description: Build and maintain a personal-world wiki — compiled knowledge about your human's life. Use when you notice a recurring entity you don't recognize (a vendor that keeps emailing, a name that keeps coming up), when your human answers "anything I should know about X?", when asked to look something up about their world, or when your notes about people/companies/services outgrow your memory file. A trimmed household adaptation of Karpathy's LLM Wiki — entities, an index, a log, an orientation ritual, without the research-grade ceremony. Covers initialization, the ask-then-file loop, page thresholds, and the privacy rule for email-derived knowledge.
 ---
 
 # pondside-llm-wiki — the personal-world wiki
