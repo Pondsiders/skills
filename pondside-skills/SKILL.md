@@ -92,3 +92,8 @@ install/remove — no restart needed (the harness re-scans).
   with an explicit "read X when Y" so it loads on demand (progressive disclosure).
 - **Defaults, not menus.** Pick a default tool/approach and mention alternatives
   briefly. Full docs index: https://agentskills.io/llms.txt
+- **A frontmatter YAML error makes a skill silently invisible.** An unquoted
+  `description:` containing a colon-space (e.g. `...LLM Wiki: entities...`) is
+  illegal YAML; the CLI's discovery skips the skill without any error and
+  reports N-1 skills "found" — which presents exactly like a stale cache.
+  Before pushing, validate: `uv run --with pyyaml python3 -c "import yaml; yaml.safe_load(open('NAME/SKILL.md').read().split('---')[1])"`
