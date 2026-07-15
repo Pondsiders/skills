@@ -64,7 +64,7 @@ def client(agent: dict) -> httpx.Client:
     return httpx.Client(
         base_url=agent["base"],
         headers={"Authorization": f"Bearer {get_key(agent['key_name'])}"},
-        timeout=180.0,
+        timeout=600.0,  # whispers can trigger real work (installs, searches) — be patient
     )
 
 

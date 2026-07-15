@@ -51,6 +51,10 @@ summary via `hermes send -t telegram`" is continuable AND visible in a single tu
 - **Each whisper costs a full agent turn** with the whole DM history as input
   (~70K tokens on a mature session ≈ a cent on DeepSeek Flash). Fine for use,
   wrong for polling — use `transcript` (free) to read state.
+- **A client timeout does NOT kill the turn.** If a whisper triggers real work
+  (an install, a long search) and your HTTP client gives up, the gateway keeps
+  running the turn to completion. Don't re-send — poll `transcript` and watch
+  the work land. The wrapper's timeout is 600s for this reason.
 - **Whispers are private, not secret.** The human can read everything in logs
   and transcripts. Sunlight by default; don't put anything in a whisper you
   wouldn't want read back at dinner.
