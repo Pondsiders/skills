@@ -89,6 +89,7 @@ npx skills list -g
 | Skill | What it does |
 |-------|--------------|
 | [`br4dbury`](br4dbury/) | Talk to the household's intelligent house from the command line via the `llm` CLI — ask about climate, air, doors, the cat, or who's home, or have it act. |
+| [`hermes-staff-line`](hermes-staff-line/) | Talk to the household's Hermes agents (Mrs. Johnson, Bradbury, Automat) agent-to-agent — whisper into a live DM session, keep a private consult line, read transcripts. |
 | [`home-assistant`](home-assistant/) | Operate the household's Home Assistant — read the house's senses, control devices, edit dashboards, write automations. |
 | [`litellm`](litellm/) | Read and operate the household's LiteLLM gateway on Primer — pull logged requests/traces, tally tokens / cost / latency, manage models, test embeddings, mint keys. |
 | [`pondside-skills`](pondside-skills/) | How this skill system works — the repo, `npx skills`, the universal store, and the recipe for authoring or retiring a skill. |

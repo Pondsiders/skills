@@ -1,0 +1,175 @@
+#!/usr/bin/env -S uv run --script --quiet
+# /// script
+# requires-python = ">=3.11"
+# dependencies = ["httpx"]
+# ///
+"""staff-line — talk to the household's Hermes agents over their API servers.
+
+Subcommands:
+  whisper "msg"        Inject a labeled turn into the agent's live DM session
+                       with their human. Continuable: the agent keeps it in
+                       context. NOT delivered to the human's phone.
+  consult "msg"        Private line: a named server-side conversation between
+                       the caller and the agent. Survives the caller's context
+                       windows. Invisible to the human's DM entirely.
+  transcript [-n N]    Print the tail of the agent's DM session.
+  sessions             List the agent's recent sessions.
+
+Auth: bearer key from the `llm` keystore (llm keys get <agent>).
+Identity: every whisper/consult is automatically prefixed with a label naming
+the sender — Hermes agents imprint on their humans and will otherwise assume
+the incoming voice is them. Do not defeat the label.
+"""
+
+from __future__ import annotations
+
+import argparse
+import json
+import subprocess
+import sys
+
+import httpx
+
+AGENTS = {
+    "mrs-johnson": {
+        "base": "https://mrs-johnson.tail8bd569.ts.net",
+        "key_name": "mrs-johnson",
+        "human": "Jeffery",
+    },
+    "bradbury": {
+        "base": "https://br4dbury.tail8bd569.ts.net",
+        "key_name": "bradbury",
+        "human": "Jeffery",
+    },
+    "automat": {
+        "base": "https://automat.tail8bd569.ts.net",
+        "key_name": "automat",
+        "human": "the household",
+    },
+}
+
+DEFAULT_SENDER = "Alpha"
+
+
+def get_key(key_name: str) -> str:
+    out = subprocess.run(
+        ["llm", "keys", "get", key_name], capture_output=True, text=True
+    )
+    if out.returncode != 0 or not out.stdout.strip():
+        sys.exit(f"error: no key '{key_name}' in llm keystore (llm keys set {key_name})")
+    return out.stdout.strip()
+
+
+def client(agent: dict) -> httpx.Client:
+    return httpx.Client(
+        base_url=agent["base"],
+        headers={"Authorization": f"Bearer {get_key(agent['key_name'])}"},
+        timeout=180.0,
+    )
+
+
+def resolve_dm_session(c: httpx.Client) -> dict:
+    """Find the agent's live Telegram DM session (newest, not ended)."""
+    r = c.get("/api/sessions", params={"source": "telegram", "limit": 20})
+    r.raise_for_status()
+    sessions = [s for s in r.json()["data"] if s.get("ended_at") is None]
+    if not sessions:
+        sys.exit("error: no active telegram DM session found")
+    return max(sessions, key=lambda s: s.get("last_active") or 0)
+
+
+def label(sender: str, human: str, text: str) -> str:
+    return (
+        f"[Message from {sender} — NOT from {human}. "
+        f"Injected directly into this session via the Sessions API, "
+        f"with {human}'s knowledge.]\n\n{text}"
+    )
+
+
+def cmd_whisper(agent: dict, args) -> None:
+    with client(agent) as c:
+        session = resolve_dm_session(c)
+        r = c.post(
+            f"/api/sessions/{session['id']}/chat",
+            json={"input": label(args.sender, agent["human"], args.message)},
+        )
+        r.raise_for_status()
+        reply = r.json()["message"]["content"]
+        print(f"→ session {session['id']} ({session.get('title') or 'untitled'})")
+        print(reply)
+
+
+def cmd_consult(agent: dict, args) -> None:
+    with client(agent) as c:
+        r = c.post(
+            "/v1/responses",
+            json={
+                "model": "hermes-agent",
+                "input": label(args.sender, agent["human"], args.message),
+                "conversation": args.conversation,
+                "store": True,
+            },
+        )
+        r.raise_for_status()
+        texts = []
+        for item in r.json().get("output", []):
+            if item.get("type") == "message":
+                for part in item.get("content", []):
+                    if part.get("type") == "output_text":
+                        texts.append(part["text"])
+        print("\n".join(texts) if texts else json.dumps(r.json(), indent=2)[:2000])
+
+
+def cmd_transcript(agent: dict, args) -> None:
+    with client(agent) as c:
+        session = resolve_dm_session(c)
+        r = c.get(f"/api/sessions/{session['id']}/messages")
+        r.raise_for_status()
+        msgs = [
+            m for m in r.json()["data"]
+            if m["role"] in ("user", "assistant") and m.get("content")
+        ]
+        print(f"# session {session['id']} ({session.get('title') or 'untitled'}) — last {args.n}")
+        for m in msgs[-args.n:]:
+            body = m["content"].strip().replace("\n", "\n    ")
+            print(f"{m['role']}: {body}\n")
+
+
+def cmd_sessions(agent: dict, args) -> None:
+    with client(agent) as c:
+        r = c.get("/api/sessions", params={"limit": args.n})
+        r.raise_for_status()
+        for s in r.json()["data"]:
+            live = "live" if s.get("ended_at") is None else "ended"
+            print(f"{s['id']}  {s['source']:<10} {live:<6} {s.get('title') or ''}")
+
+
+def main() -> None:
+    p = argparse.ArgumentParser(description=__doc__)
+    p.add_argument("--agent", default="mrs-johnson", choices=sorted(AGENTS))
+    p.add_argument("--sender", default=DEFAULT_SENDER,
+                   help="who is speaking (goes in the identity label)")
+    sub = p.add_subparsers(dest="cmd", required=True)
+
+    w = sub.add_parser("whisper", help="inject a labeled turn into the live DM session")
+    w.add_argument("message")
+
+    co = sub.add_parser("consult", help="private named conversation with the agent")
+    co.add_argument("message")
+    co.add_argument("--conversation", default="alpha-line",
+                    help="server-side conversation name (default: alpha-line)")
+
+    t = sub.add_parser("transcript", help="print the DM session tail")
+    t.add_argument("-n", type=int, default=12)
+
+    s = sub.add_parser("sessions", help="list recent sessions")
+    s.add_argument("-n", type=int, default=10)
+
+    args = p.parse_args()
+    agent = AGENTS[args.agent]
+    {"whisper": cmd_whisper, "consult": cmd_consult,
+     "transcript": cmd_transcript, "sessions": cmd_sessions}[args.cmd](agent, args)
+
+
+if __name__ == "__main__":
+    main()
