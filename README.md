@@ -92,5 +92,6 @@ npx skills list -g
 | [`hermes-staff-line`](hermes-staff-line/) | Talk to the household's Hermes agents (Mrs. Johnson, Bradbury, Automat) agent-to-agent — whisper into a live DM session, keep a private consult line, read transcripts. |
 | [`home-assistant`](home-assistant/) | Operate the household's Home Assistant — read the house's senses, control devices, edit dashboards, write automations. |
 | [`litellm`](litellm/) | Read and operate the household's LiteLLM gateway on Primer — pull logged requests/traces, tally tokens / cost / latency, manage models, test embeddings, mint keys. |
+| [`pondside-llm-wiki`](pondside-llm-wiki/) | A personal-world wiki for household agents — compiled knowledge about your human's life (vendors, people, services), trimmed from Karpathy's LLM Wiki pattern. |
 | [`pondside-skills`](pondside-skills/) | How this skill system works — the repo, `npx skills`, the universal store, and the recipe for authoring or retiring a skill. |
 | [`files-ideas-problems`](files-ideas-problems/) | How Jeffery and Alpha track work in the Obsidian vault — the desk metaphor, the files / ideas / problems note types, the Bases, and the `base:query` commands. |
