@@ -14,7 +14,10 @@ scripts/staff-line.py [--agent mrs-johnson] transcript [-n 12]
 scripts/staff-line.py [--agent mrs-johnson] sessions
 ```
 
-Agents known: `mrs-johnson` (default), `bradbury`, `automat`. Auth comes from the
+Agents known: `mrs-johnson` (default), `bradbury`, `dewey`, `automat`, and
+`joan` (Kylee's PA — her `human` is Kylee, so the identity label reads "NOT
+from Kylee"; set `--sender` honestly, e.g. Rosemary whispering as herself).
+Auth comes from the
 `llm` keystore (`llm keys get <agent>`); endpoints are each agent's API server
 behind tailscale serve. Add a new agent = one dict entry in the script + a key.
 

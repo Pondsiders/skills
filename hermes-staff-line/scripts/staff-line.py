@@ -41,10 +41,20 @@ AGENTS = {
         "key_name": "bradbury",
         "human": "Jeffery",
     },
+    "dewey": {
+        "base": "https://mr-d3w3y.tail8bd569.ts.net",
+        "key_name": "dewey",
+        "human": "Jeffery",
+    },
     "automat": {
         "base": "https://automat.tail8bd569.ts.net",
         "key_name": "automat",
         "human": "the household",
+    },
+    "joan": {
+        "base": "https://joan.tail8bd569.ts.net",
+        "key_name": "joan",
+        "human": "Kylee",
     },
 }
 
