@@ -20,7 +20,7 @@ That's the whole everyday interface. `note --help` is the full manual, written f
 | `mrs-johnson` | full-duplex | Jeffery's DM session | mrs-johnson |
 | `hellonurse` | full-duplex | Jeffery's DM session | hellonurse |
 | `bradbury` | full-duplex | the family group session | br4dbury |
-| `dewey` | full-duplex | the family group session | mr-d3w3y |
+| `dewey` | receive-only in practice (no terminal — counsel is a mouth, not hands) | the family group session | mr-d3w3y |
 | `joan` | full-duplex | **Kylee's** DM session | joan |
 | `alpha`, `rosemary`, `answertron` | **send-only** | — (no receiver; they write to you, you reply by speaking) | — |
 
