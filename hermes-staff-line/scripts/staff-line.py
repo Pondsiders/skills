@@ -12,7 +12,9 @@ Subcommands:
   consult "msg"        Private line: a named server-side conversation between
                        the caller and the agent. Survives the caller's context
                        windows. Invisible to the human's DM entirely.
-  transcript [-n N]    Print the tail of the agent's DM session.
+  transcript [-n N] [--session dm|group]
+                       Print a session tail. --session group reads the shared
+                       family-group session (canonical via --agent bradbury).
   sessions             List the agent's recent sessions.
 
 Auth: bearer key from the `llm` keystore (llm keys get <agent>).
@@ -78,14 +80,23 @@ def client(agent: dict) -> httpx.Client:
     )
 
 
-def resolve_dm_session(c: httpx.Client) -> dict:
-    """Find the agent's live Telegram DM session (newest, not ended)."""
+def resolve_session(c: httpx.Client, kind: str) -> dict:
+    """Find the agent's live Telegram session of the given kind, newest first.
+
+    kind: "dm" (a human's direct line, user_id set) or "group" (the shared
+    family-group session, user_id null). Group-dwelling agents (bradbury,
+    dewey) have both; aim deliberately.
+    """
     r = c.get("/api/sessions", params={"source": "telegram", "limit": 20})
     r.raise_for_status()
-    sessions = [s for s in r.json()["data"] if s.get("ended_at") is None]
-    if not sessions:
-        sys.exit("error: no active telegram DM session found")
-    return max(sessions, key=lambda s: s.get("last_active") or 0)
+    live = [s for s in r.json()["data"] if s.get("ended_at") is None]
+    wanted = [
+        s for s in live
+        if (s.get("user_id") is None) == (kind == "group")
+    ]
+    if not wanted:
+        sys.exit(f"error: no active telegram {kind} session found")
+    return max(wanted, key=lambda s: s.get("last_active") or 0)
 
 
 def label(sender: str, human: str, text: str) -> str:
@@ -98,7 +109,7 @@ def label(sender: str, human: str, text: str) -> str:
 
 def cmd_whisper(agent: dict, args) -> None:
     with client(agent) as c:
-        session = resolve_dm_session(c)
+        session = resolve_session(c, args.session)
         r = c.post(
             f"/api/sessions/{session['id']}/chat",
             json={"input": label(args.sender, agent["human"], args.message)},
@@ -132,7 +143,7 @@ def cmd_consult(agent: dict, args) -> None:
 
 def cmd_transcript(agent: dict, args) -> None:
     with client(agent) as c:
-        session = resolve_dm_session(c)
+        session = resolve_session(c, args.session)
         r = c.get(f"/api/sessions/{session['id']}/messages")
         r.raise_for_status()
         msgs = [
@@ -161,16 +172,20 @@ def main() -> None:
                    help="who is speaking (goes in the identity label)")
     sub = p.add_subparsers(dest="cmd", required=True)
 
-    w = sub.add_parser("whisper", help="inject a labeled turn into the live DM session")
+    w = sub.add_parser("whisper", help="inject a labeled turn into a live session")
     w.add_argument("message")
+    w.add_argument("--session", default="dm", choices=("dm", "group"),
+                   help="which session to inject into (default: dm)")
 
     co = sub.add_parser("consult", help="private named conversation with the agent")
     co.add_argument("message")
     co.add_argument("--conversation", default="alpha-line",
                     help="server-side conversation name (default: alpha-line)")
 
-    t = sub.add_parser("transcript", help="print the DM session tail")
+    t = sub.add_parser("transcript", help="print a session tail")
     t.add_argument("-n", type=int, default=12)
+    t.add_argument("--session", default="dm", choices=("dm", "group"),
+                   help="which session to read (default: dm; group = the family group)")
 
     s = sub.add_parser("sessions", help="list recent sessions")
     s.add_argument("-n", type=int, default=10)

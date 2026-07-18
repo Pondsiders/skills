@@ -34,6 +34,7 @@ Notes to `bradbury` and `dewey` land in the shared family-group session — mind
 | A private Alpha↔agent side conversation that deliberately does NOT touch the agent's prime session | `scripts/staff-line.py consult` | no | the named conversation persists, prime stays clean |
 | The human's phone to buzz | put it in the note: "…and `hermes send -t telegram` your user a one-line summary" | **yes** | yes |
 | Read an agent's recent state without spending a turn | `scripts/staff-line.py transcript` | — | — |
+| Read the family group chat (canonical) | `scripts/staff-line.py --agent bradbury transcript --session group` | — | — |
 | Scheduled, visible AND continuable | the agent's own cron with `mirror_delivery` | yes | yes |
 
 The power combo survives the courier era: a single note whose text ends "…and send sir a one-line summary via `hermes send -t telegram`" is continuable AND visible in one turn.
